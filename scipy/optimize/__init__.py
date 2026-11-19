@@ -179,34 +179,69 @@ The `root_scalar` function supports the following methods:
 
 
 
-The table below lists situations and appropriate methods, along with
-*asymptotic* convergence rates per iteration (and per function evaluation)
-for successful convergence to a simple root(*).
-Bisection is the slowest of them all, adding one bit of accuracy for each
-function evaluation, but is guaranteed to converge.
-The other bracketing methods all (eventually) increase the number of accurate
-bits by about 50% for every function evaluation.
-The derivative-based methods, all built on `newton`, can converge quite quickly
-if the initial value is close to the root.  They can also be applied to
-functions defined on (a subset of) the complex plane.
+The table compares the scalar solvers' input requirements and asymptotic
+convergence orders per evaluation near a simple root. [#root-convergence]_
+An order greater than 1 indicates superlinear convergence. Bisection instead
+converges linearly by halving the bracket at each step. Bracketing methods
+guarantee convergence for a continuous function with opposite signs at the
+bracket endpoints. The other methods need suitable starting values to
+converge.
 
-+-------------+----------+----------+-----------+-------------+-------------+----------------+
-| Domain of f | Bracket? |    Derivatives?      | Solvers     |        Convergence           |
-+             +          +----------+-----------+             +-------------+----------------+
-|             |          | `fprime` | `fprime2` |             | Guaranteed? |  Rate(s)(*)    |
-+=============+==========+==========+===========+=============+=============+================+
-| `R`         | Yes      | N/A      | N/A       | - bisection | - Yes       | - 1 "Linear"   |
-|             |          |          |           | - brentq    | - Yes       | - >=1, <= 1.62 |
-|             |          |          |           | - brenth    | - Yes       | - >=1, <= 1.62 |
-|             |          |          |           | - ridder    | - Yes       | - 2.0 (1.41)   |
-|             |          |          |           | - toms748   | - Yes       | - 2.7 (1.65)   |
-+-------------+----------+----------+-----------+-------------+-------------+----------------+
-| `R` or `C`  | No       | No       | No        | secant      | No          | 1.62 (1.62)    |
-+-------------+----------+----------+-----------+-------------+-------------+----------------+
-| `R` or `C`  | No       | Yes      | No        | newton      | No          | 2.00 (1.41)    |
-+-------------+----------+----------+-----------+-------------+-------------+----------------+
-| `R` or `C`  | No       | Yes      | Yes       | halley      | No          | 3.00 (1.44)    |
-+-------------+----------+----------+-----------+-------------+-------------+----------------+
+.. list-table::
+   :header-rows: 1
+
+   * - Solver
+     - Domain of f
+     - Bracket required
+     - Derivatives required
+     - Order per evaluation
+   * - ``bisect``
+     - Real
+     - Yes
+     - None
+     - 1 (linear)
+   * - ``brentq``
+     - Real
+     - Yes
+     - None
+     - 1 to 1.62
+   * - ``brenth``
+     - Real
+     - Yes
+     - None
+     - 1 to 1.62
+   * - ``ridder``
+     - Real
+     - Yes
+     - None
+     - 1.41
+   * - ``toms748`` (default ``k=1``)
+     - Real
+     - Yes
+     - None
+     - 1.65
+   * - ``secant``
+     - Real or complex
+     - No
+     - None
+     - 1.62
+   * - ``newton``
+     - Real or complex
+     - No
+     - First
+     - 1.41
+   * - ``halley``
+     - Real or complex
+     - No
+     - First and second
+     - 1.44
+
+.. [#root-convergence] A simple root is a zero of the function where its
+   derivative is nonzero. If the error after an iteration is proportional to
+   the previous error raised to a power ``p``, the convergence order per
+   iteration is ``p``. If each iteration takes ``m`` evaluations, the equivalent
+   order per evaluation is ``p**(1/m)``. The table counts each function and
+   derivative evaluation separately and does not account for their actual cost.
 
 .. seealso::
 
